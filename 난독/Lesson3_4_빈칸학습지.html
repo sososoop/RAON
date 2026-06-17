@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3 &amp; 4 빈칸 학습지 (난독 친화)</title>
+<style>
+  :root{
+    --ink:#2b2620;
+    --cream:#FBF7EF;
+    --paper:#FFFFFF;
+    --navy:#26336b;
+    --navy-soft:#eef1fa;
+    --green:#3f7a52;
+    --green-soft:#eaf4ec;
+    --amber:#b9772a;
+    --amber-soft:#fbf1e2;
+    --rose:#a8475b;
+    --rose-soft:#f8ecef;
+    --blank:#1f4fd6;
+    --line:#d8cfbe;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    font-size:18px;
+    line-height:1.75;
+    letter-spacing:0.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:820px;
+    margin:0 auto;
+    padding:28px 30px 60px;
+  }
+  header.top{
+    background:var(--navy);
+    color:#fff;
+    border-radius:16px;
+    padding:22px 26px;
+    margin-bottom:22px;
+  }
+  header.top h1{margin:0;font-size:26px;letter-spacing:0;}
+  header.top p{margin:8px 0 0;font-size:16px;opacity:.92;}
+  .meta{
+    display:flex;gap:18px;flex-wrap:wrap;
+    margin-top:14px;font-size:15px;
+  }
+  .meta span{
+    background:rgba(255,255,255,.14);
+    padding:4px 12px;border-radius:999px;
+  }
+
+  .note{
+    background:var(--amber-soft);
+    border:2px solid #e8cfa6;
+    border-radius:14px;
+    padding:16px 20px;
+    margin-bottom:26px;
+    font-size:16px;
+  }
+  .note b{color:var(--amber);}
+  .note ul{margin:8px 0 0;padding-left:20px;}
+  .note li{margin:3px 0;}
+
+  section{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px 24px 24px;
+    margin-bottom:24px;
+    page-break-inside:avoid;
+  }
+  .s-head{
+    display:flex;align-items:center;gap:10px;
+    font-size:21px;font-weight:800;
+    padding-bottom:6px;margin-bottom:14px;
+    border-bottom:3px solid currentColor;
+  }
+  .s-head .num{
+    background:currentColor;color:#fff;
+    width:34px;height:34px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex:0 0 auto;
+  }
+  .s-head .num b{color:#fff;}
+  .c-navy .s-head{color:var(--navy);}
+  .c-green .s-head{color:var(--green);}
+  .c-amber .s-head{color:var(--amber);}
+  .c-rose .s-head{color:var(--rose);}
+  .tip{font-size:15px;color:#6a6052;margin:-6px 0 14px;}
+
+  /* 단어 은행 */
+  .bank{
+    background:var(--navy-soft);
+    border:1px dashed #aab4d8;
+    border-radius:12px;
+    padding:12px 16px;margin:0 0 16px;
+    font-size:16px;
+  }
+  .bank .label{font-weight:800;color:var(--navy);margin-right:8px;}
+  .bank .w{
+    display:inline-block;
+    background:#fff;border:1px solid #c3cbe6;border-radius:8px;
+    padding:2px 10px;margin:4px 5px;font-weight:600;
+  }
+
+  /* 스펠링 표 */
+  table{width:100%;border-collapse:collapse;font-size:17px;}
+  th,td{padding:9px 10px;border-bottom:1px solid #ece5d6;text-align:left;vertical-align:middle;}
+  th{font-size:14px;color:#7a7060;font-weight:700;border-bottom:2px solid var(--line);}
+  td.kor{font-weight:700;width:34%;}
+  td.hint{color:#8a8073;font-size:14px;width:24%;}
+  .num-cell{color:#b3a892;width:34px;font-size:15px;}
+  .given{font-weight:700;letter-spacing:.04em;font-size:19px;}
+  .gap{
+    display:inline-block;
+    border-bottom:2.5px solid var(--blank);
+    min-width:54px;height:1.1em;margin:0 2px;vertical-align:bottom;
+  }
+  .gap.sm{min-width:38px;}
+  .gap.lg{min-width:80px;}
+
+  /* 고르기 */
+  ol.q{margin:0;padding-left:26px;}
+  ol.q li{margin:13px 0;}
+  .pick{font-weight:700;color:var(--blank);}
+  .pick .sl{color:#bbb;margin:0 4px;font-weight:400;}
+  .ko{color:#8a8073;font-size:14px;margin-left:6px;}
+
+  /* 매칭 */
+  .match{display:flex;gap:30px;flex-wrap:wrap;}
+  .match .col{flex:1;min-width:200px;}
+  .match .row{
+    display:flex;align-items:center;gap:10px;margin:7px 0;
+    border-bottom:1px solid #ece5d6;padding-bottom:6px;
+  }
+  .match .en{font-weight:700;font-size:18px;}
+  .match .tag{
+    width:26px;height:26px;border:2px solid var(--green);
+    border-radius:7px;flex:0 0 auto;
+  }
+  .match .ko2{flex:1;}
+
+  /* 빈칸 문장 */
+  .fill li{margin:11px 0;line-height:1.9;}
+  .blank{
+    display:inline-block;border-bottom:2.5px solid var(--amber);
+    min-width:110px;text-align:center;margin:0 3px;
+  }
+
+  /* 정답 */
+  .answers{page-break-before:always;}
+  .answers section{background:#f4f7f2;border-color:#cdddc8;}
+  .answers .s-head{color:var(--green);}
+  .ans-grid{columns:2;column-gap:30px;font-size:15px;line-height:1.6;}
+  .ans-grid p{margin:3px 0;break-inside:avoid;}
+  .ans-grid b{color:var(--green);}
+
+  .foot{text-align:center;color:#a89c87;font-size:13px;margin-top:30px;}
+
+  @media print{
+    body{background:#fff;font-size:15.5px;}
+    .page{max-width:none;padding:0 6mm;}
+    section{box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <h1>📘 Lesson 3 &amp; 4 — 단어 빈칸 학습지</h1>
+    <p>헷갈리는 철자·뜻을 콕 집어 연습하는 난독 친화 학습지예요. 천천히, 소리 내어 읽으면서 풀어요!</p>
+    <div class="meta">
+      <span>이름 : ______________</span>
+      <span>날짜 : ______________</span>
+      <span>맞은 개수 : ______ / 50</span>
+    </div>
+  </header>
+
+  <div class="note">
+    <b>🔍 이번 단원 헷갈림 포인트</b>
+    <ul>
+      <li><b>철자가 길거나 불규칙</b> — camouflage · necessary(c 1개, s 2개) · disappear(p 2개) · although(gh 소리 안 남)</li>
+      <li><b>모양이 닮은 짝</b> — similar(비슷한) ↔ several(몇몇의) / wise ↔ wisdom</li>
+      <li><b>뜻이 비슷한 단어</b> — hide(숨다) · escape(탈출하다) · disappear(사라지다)</li>
+      <li><b>연결어 묶음</b> — although · however · instead · in fact · in addition · as a result · rather than</li>
+    </ul>
+  </div>
+
+  <!-- PART 1 -->
+  <section class="c-navy">
+    <div class="s-head"><span class="num"><b>1</b></span> 철자 빈칸 채우기</div>
+    <p class="tip">파란 칸에 빠진 글자를 써 넣어요. 뜻과 글자 수 힌트를 보고 천천히!</p>
+    <table>
+      <tr><th>No</th><th>뜻</th><th>단어 (빈칸 채우기)</th><th>힌트</th></tr>
+      <tr><td class="num-cell">1</td><td class="kor">위장(술)</td><td><span class="given">cam</span><span class="gap sm"></span><span class="given">flage</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">2</td><td class="kor">포식자</td><td><span class="given">pre</span><span class="gap sm"></span><span class="given">tor</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">3</td><td class="kor">도서관</td><td><span class="given">lib</span><span class="gap sm"></span><span class="given">ry</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">4</td><td class="kor">아름다운</td><td><span class="given">b</span><span class="gap"></span><span class="given">tiful</span></td><td class="hint">빠진 글자 3개</td></tr>
+      <tr><td class="num-cell">5</td><td class="kor">주변 환경</td><td><span class="given">su</span><span class="gap"></span><span class="given">undings</span></td><td class="hint">빠진 글자 3개 (r 주의)</td></tr>
+      <tr><td class="num-cell">6</td><td class="kor">위험한</td><td><span class="given">danger</span><span class="gap"></span></td><td class="hint">끝 3글자</td></tr>
+      <tr><td class="num-cell">7</td><td class="kor">눈에 안 보이는</td><td><span class="given">in</span><span class="gap"></span><span class="given">ible</span></td><td class="hint">빠진 글자 3개</td></tr>
+      <tr><td class="num-cell">8</td><td class="kor">사라지다</td><td><span class="given">di</span><span class="gap"></span><span class="given">pear</span></td><td class="hint">p가 몇 개일까?</td></tr>
+      <tr><td class="num-cell">9</td><td class="kor">필요한</td><td><span class="given">ne</span><span class="gap"></span><span class="given">sary</span></td><td class="hint">c 1개 · s 2개!</td></tr>
+      <tr><td class="num-cell">10</td><td class="kor">비록 ~이지만</td><td><span class="given">al</span><span class="gap sm"></span><span class="given">ough</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">11</td><td class="kor">경험</td><td><span class="given">exp</span><span class="gap sm"></span><span class="given">ience</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">12</td><td class="kor">비슷한</td><td><span class="given">si</span><span class="gap sm"></span><span class="given">lar</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">13</td><td class="kor">파충류</td><td><span class="given">rep</span><span class="gap sm"></span><span class="given">le</span></td><td class="hint">빠진 글자 2개</td></tr>
+      <tr><td class="num-cell">14</td><td class="kor">우산</td><td><span class="given">um</span><span class="gap"></span><span class="given">lla</span></td><td class="hint">빠진 글자 3개</td></tr>
+      <tr><td class="num-cell">15</td><td class="kor">놀라운</td><td><span class="given">a</span><span class="gap sm"></span><span class="given">zing</span></td><td class="hint">빠진 글자 2개</td></tr>
+    </table>
+  </section>
+
+  <!-- PART 2 -->
+  <section class="c-rose">
+    <div class="s-head"><span class="num"><b>2</b></span> 헷갈리는 짝꿍 단어 — 알맞은 것 고르기</div>
+    <p class="tip">문장에 맞는 단어에 동그라미 하세요. 뜻을 잘 생각해요!</p>
+    <ol class="q">
+      <li>The lion is a fierce <span class="pick">( predator <span class="sl">/</span> protect )</span>. <span class="ko">사자는 사나운 ___이다.</span></li>
+      <li>There are <span class="pick">( similar <span class="sl">/</span> several )</span> reasons to visit Mars. <span class="ko">화성에 갈 ___ 이유가 있다.</span></li>
+      <li>Mars has a day length <span class="pick">( similar <span class="sl">/</span> several )</span> to Earth's. <span class="ko">화성의 하루 길이는 지구와 ___.</span></li>
+      <li>The owl is <span class="pick">( wise <span class="sl">/</span> wisdom )</span>. <span class="ko">올빼미는 ___ (형용사 자리).</span></li>
+      <li>The owl is a symbol of <span class="pick">( wise <span class="sl">/</span> wisdom )</span>. <span class="ko">올빼미는 ___의 상징이다.</span></li>
+      <li>The fish tried to <span class="pick">( hide <span class="sl">/</span> escape )</span> from the net. <span class="ko">물고기는 그물에서 ___하려 했다.</span></li>
+      <li>Turtles <span class="pick">( hide <span class="sl">/</span> escape )</span> inside their shells. <span class="ko">거북은 등딱지 안에 ___.</span></li>
+      <li>The octopus has an <span class="pick">( invisible <span class="sl">/</span> amazing )</span> ability to change color. <span class="ko">문어는 ___ 색 바꾸기 능력이 있다.</span></li>
+    </ol>
+  </section>
+
+  <!-- PART 3 -->
+  <section class="c-green">
+    <div class="s-head"><span class="num"><b>3</b></span> 연결어·표현 익히기</div>
+    <p class="tip">① 먼저 영어–뜻을 줄로 잇고 ② 아래 문장 빈칸을 채워요.</p>
+    <div class="match">
+      <div class="col">
+        <div class="row"><span class="en">although</span><span class="tag"></span><span class="ko2"></span></div>
+        <div class="row"><span class="en">however</span><span class="tag"></span><span class="ko2"></span></div>
+        <div class="row"><span class="en">instead</span><span class="tag"></span><span class="ko2"></span></div>
+        <div class="row"><span class="en">in fact</span><span class="tag"></span><span class="ko2"></span></div>
+      </div>
+      <div class="col">
+        <div class="row"><span class="en">in addition</span><span class="tag"></span><span class="ko2"></span></div>
+        <div class="row"><span class="en">as a result</span><span class="tag"></span><span class="ko2"></span></div>
+        <div class="row"><span class="en">rather than</span><span class="tag"></span><span class="ko2"></span></div>
+      </div>
+    </div>
+    <div class="bank" style="margin-top:16px;">
+      <span class="label">뜻 은행</span>
+      <span class="w">비록 ~이지만</span><span class="w">그러나</span><span class="w">대신에</span><span class="w">사실은</span>
+      <span class="w">게다가</span><span class="w">결과적으로</span><span class="w">~보다는</span>
+    </div>
+
+    <ol class="q fill" style="margin-top:8px;">
+      <li><span class="blank"></span> it was raining, we went outside. <span class="ko">비가 왔지만 우리는 밖에 나갔다.</span></li>
+      <li>It looks cute. <span class="blank"></span>, it can bite hard. <span class="ko">귀여워 보인다. 그러나 세게 물 수 있다.</span></li>
+      <li>Snakes don't have legs. <span class="blank"></span>, they slide. <span class="ko">뱀은 다리가 없다. 대신 미끄러진다.</span></li>
+      <li>He studied hard. <span class="blank"></span>, he passed the test. <span class="ko">열심히 공부했다. 결과적으로 합격했다.</span></li>
+      <li>She walks <span class="blank"></span> takes the bus. <span class="ko">그녀는 버스를 타기보다 걷는다.</span></li>
+    </ol>
+  </section>
+
+  <!-- PART 4 -->
+  <section class="c-amber">
+    <div class="s-head"><span class="num"><b>4</b></span> 예문 빈칸 채우기</div>
+    <p class="tip">아래 단어 은행에서 골라 빈칸에 써요. 한 번씩만 사용해요!</p>
+    <div class="bank">
+      <span class="label">단어 은행</span>
+      <span class="w">camouflage</span><span class="w">predator</span><span class="w">ink</span><span class="w">wisdom</span>
+      <span class="w">hide</span><span class="w">hatch</span><span class="w">necessary</span><span class="w">similar</span>
+      <span class="w">several</span><span class="w">umbrella</span><span class="w">magical</span><span class="w">invisible</span>
+    </div>
+    <ol class="q fill">
+      <li>The chameleon uses <span class="blank"></span> to hide from predators. <span class="ko">위장</span></li>
+      <li>The lion is a fierce <span class="blank"></span>. <span class="ko">포식자</span></li>
+      <li>The octopus shoots <span class="blank"></span> to escape from danger. <span class="ko">먹물</span></li>
+      <li>The owl is a symbol of <span class="blank"></span>. <span class="ko">지혜</span></li>
+      <li>Turtles <span class="blank"></span> inside their shells rather than run away. <span class="ko">숨다</span></li>
+      <li>The baby turtles <span class="blank"></span> from eggs in the sand. <span class="ko">부화하다</span></li>
+      <li>Water is <span class="blank"></span> for all living things. <span class="ko">필요한</span></li>
+      <li>Mars has a day length <span class="blank"></span> to Earth's. <span class="ko">비슷한</span></li>
+      <li>There are <span class="blank"></span> reasons to visit Mars. <span class="ko">몇몇의</span></li>
+      <li>Bring an <span class="blank"></span> — it rains a lot in London. <span class="ko">우산</span></li>
+      <li>We had a <span class="blank"></span> experience at the studio. <span class="ko">마법 같은</span></li>
+      <li>The insect is almost <span class="blank"></span> on the leaf. <span class="ko">눈에 안 보이는</span></li>
+    </ol>
+  </section>
+
+  <!-- ANSWERS -->
+  <div class="answers">
+  <section>
+    <div class="s-head"><span class="num"><b>✓</b></span> 정답지</div>
+
+    <p style="font-weight:800;color:var(--navy);margin:6px 0 2px;">Part 1 · 철자</p>
+    <div class="ans-grid">
+      <p>1. <b>camou</b>flage</p>
+      <p>2. pre<b>da</b>tor</p>
+      <p>3. lib<b>ra</b>ry</p>
+      <p>4. b<b>eau</b>tiful</p>
+      <p>5. su<b>rro</b>undings</p>
+      <p>6. danger<b>ous</b></p>
+      <p>7. in<b>vis</b>ible</p>
+      <p>8. di<b>sap</b>pear (p 2개)</p>
+      <p>9. ne<b>ces</b>sary (c 1·s 2)</p>
+      <p>10. al<b>th</b>ough</p>
+      <p>11. exp<b>er</b>ience</p>
+      <p>12. si<b>mi</b>lar</p>
+      <p>13. rep<b>ti</b>le</p>
+      <p>14. um<b>bre</b>lla</p>
+      <p>15. a<b>ma</b>zing</p>
+    </div>
+
+    <p style="font-weight:800;color:var(--rose);margin:14px 0 2px;">Part 2 · 고르기</p>
+    <div class="ans-grid">
+      <p>1. <b>predator</b></p>
+      <p>2. <b>several</b></p>
+      <p>3. <b>similar</b></p>
+      <p>4. <b>wise</b></p>
+      <p>5. <b>wisdom</b></p>
+      <p>6. <b>escape</b></p>
+      <p>7. <b>hide</b></p>
+      <p>8. <b>amazing</b></p>
+    </div>
+
+    <p style="font-weight:800;color:var(--green);margin:14px 0 2px;">Part 3 · 연결어</p>
+    <div class="ans-grid">
+      <p>although=비록~이지만 / however=그러나 / instead=대신에 / in fact=사실은 / in addition=게다가 / as a result=결과적으로 / rather than=~보다는</p>
+      <p>① <b>Although</b> ② <b>However</b> ③ <b>Instead</b> ④ <b>As a result</b> ⑤ <b>rather than</b></p>
+    </div>
+
+    <p style="font-weight:800;color:var(--amber);margin:14px 0 2px;">Part 4 · 예문</p>
+    <div class="ans-grid">
+      <p>1. <b>camouflage</b></p>
+      <p>2. <b>predator</b></p>
+      <p>3. <b>ink</b></p>
+      <p>4. <b>wisdom</b></p>
+      <p>5. <b>hide</b></p>
+      <p>6. <b>hatch</b></p>
+      <p>7. <b>necessary</b></p>
+      <p>8. <b>similar</b></p>
+      <p>9. <b>several</b></p>
+      <p>10. <b>umbrella</b></p>
+      <p>11. <b>magical</b></p>
+      <p>12. <b>invisible</b></p>
+    </div>
+  </section>
+  </div>
+
+  <p class="foot">Lesson 3 &amp; 4 빈칸 학습지 · 난독 친화 디자인 · 총 50문항</p>
+
+</div>
+</body>
+</html>
