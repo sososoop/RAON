@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>평면도형의 이동 · 단계별 학습지</title>
+<style>
+  :root{
+    --ink:#2b2620; --cream:#FBF7EF; --navy:#26336b; --line:#b9b3a6; --green:#19a06a;
+    --blue:#7ec8e3; --pink:#f4a6c0; --mint:#8fd9b6; --purple:#c3a6e8; --yellow:#ffd98a; --orange:#f6b283;
+    --shape:#1b50c4; --red:#e23b6d; --gray:#c9c3b6; --axis:#9a93a8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e8e2d6;color:var(--ink);
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif; line-height:1.55;}
+
+  .toolbar{position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;
+    display:flex;gap:10px;align-items:center;justify-content:center;
+    padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .toolbar b{font-size:15px;margin-right:auto;padding-left:6px;}
+  .toolbar button{font:inherit;font-weight:700;font-size:14px;cursor:pointer;
+    border:0;border-radius:999px;padding:8px 16px;background:#fff;color:var(--navy);}
+  .toolbar button.on{background:var(--green);color:#fff;}
+
+  .page{width:210mm;min-height:297mm;background:#fff;margin:18px auto;
+    padding:13mm 13mm 12mm;box-shadow:0 4px 16px rgba(0,0,0,.12);
+    page-break-after:always;position:relative;}
+  .page:last-child{page-break-after:auto;}
+
+  .ptop{display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--navy);padding-bottom:5px;margin-bottom:3px;}
+  .ptop .step{color:var(--navy);font-weight:800;font-size:13px;
+    background:#eef1fa;padding:3px 12px;border-radius:999px;}
+  .ptop .nd{font-size:12.5px;color:#8a8070;}
+  .ptop .nd span{display:inline-block;border-bottom:1px solid #cfc7b6;width:80px;margin-left:4px;}
+
+  h1.title{font-size:23px;color:var(--navy);margin:10px 0 3px;font-weight:800;}
+  .lead{font-size:14px;color:#5e564a;margin:0 0 10px;}
+  .howto{background:#fbf6ec;border:1.5px solid #ece2cd;border-left:5px solid var(--green);
+    border-radius:10px;padding:8px 13px;font-size:13px;margin:0 0 14px;color:#544d40;}
+  .howto b{color:var(--green);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+  .stack > .item{margin-bottom:12px;}
+  .subhd{font-size:14px;font-weight:800;color:var(--navy);margin:14px 0 8px;
+    padding-left:8px;border-left:4px solid var(--navy);}
+  .item{background:#fff;border:1.5px solid #e4ddcd;border-radius:12px;padding:9px;}
+  .item .q{font-size:12.5px;font-weight:700;color:var(--navy);margin:0 0 6px;text-align:center;}
+  .pairrow{display:flex;align-items:center;gap:5px;justify-content:center;}
+  .pairrow .arrow{font-size:17px;color:#9a917f;font-weight:800;flex:0 0 auto;}
+  .col{flex:1;min-width:0;text-align:center;}
+  .col small{display:block;font-size:10.5px;color:#9a917f;margin-bottom:3px;}
+
+  svg.puz{width:100%;height:auto;display:block;}
+  .gl{stroke:var(--line);stroke-width:1.2;}
+  .dot{fill:#3a352c;}
+  .axis{stroke:var(--axis);stroke-width:2;stroke-dasharray:3 6;}
+  .ans{display:none;}
+  body.show-ans .ans{display:inline;}
+
+  .cover{padding-top:34mm;}
+  .cover .badge{display:inline-block;background:var(--navy);color:#fff;font-weight:800;
+    padding:6px 16px;border-radius:999px;font-size:14px;}
+  .cover h1{font-size:38px;color:var(--navy);margin:18px 0 6px;line-height:1.25;}
+  .cover p{font-size:16px;color:#5e564a;max-width:480px;}
+  .ladder{margin-top:24px;border-left:3px solid #e0d8c6;}
+  .rung{display:flex;align-items:flex-start;gap:14px;margin:0 0 12px;}
+  .rung .n{flex:0 0 32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;
+    font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .rung .tx b{display:block;font-size:15px;color:var(--ink);}
+  .rung .tx span{font-size:13px;color:#8a8070;}
+
+  .foot{position:absolute;bottom:7mm;left:0;right:0;text-align:center;font-size:11px;color:#b3a890;}
+
+  @media print{
+    body{background:#fff;}
+    .toolbar{display:none;}
+    .page{margin:0;box-shadow:none;width:auto;min-height:auto;padding:11mm;}
+    @page{size:A4;margin:0;}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <b>평면도형의 이동 · 단계별 학습지</b>
+  <button id="ansBtn" onclick="toggleAns()">정답 보기</button>
+  <button onclick="window.print()">인쇄 / PDF 저장</button>
+</div>
+<div id="app"></div>
+
+<script>
+/* ===== 좌표 기반 도형 생성기 (격자·점·선이 같은 좌표계 위라 절대 어긋나지 않음) ===== */
+const PAD=12, DOTR=4.5;
+function buildSVG(cfg){
+  const S=cfg.s||44, cols=cfg.cols, rows=cfg.rows, gridType=cfg.grid||'lines';
+  const ox=PAD, oy=PAD, W=cols*S+PAD*2, H=rows*S+PAD*2;
+  const p=[];
+  p.push(`<rect x="${ox}" y="${oy}" width="${cols*S}" height="${rows*S}" fill="#fff"/>`);
+  (cfg.cells||[]).forEach(([c,r,col])=>p.push(`<rect x="${ox+c*S}" y="${oy+r*S}" width="${S}" height="${S}" fill="${col}"/>`));
+  (cfg.ansCells||[]).forEach(([c,r,col])=>p.push(`<rect class="ans" x="${ox+c*S}" y="${oy+r*S}" width="${S}" height="${S}" fill="${col}"/>`));
+  if(gridType==='lines'){
+    for(let c=0;c<=cols;c++){const x=ox+c*S;p.push(`<line class="gl" x1="${x}" y1="${oy}" x2="${x}" y2="${oy+rows*S}"/>`);}
+    for(let r=0;r<=rows;r++){const y=oy+r*S;p.push(`<line class="gl" x1="${ox}" y1="${y}" x2="${ox+cols*S}" y2="${y}"/>`);}
+  } else {
+    for(let c=0;c<=cols;c++)for(let r=0;r<=rows;r++)p.push(`<circle class="dot" cx="${ox+c*S}" cy="${oy+r*S}" r="${DOTR}"/>`);
+  }
+  if(cfg.axis){
+    if(cfg.axis.dir==='v'){const x=ox+cfg.axis.at*S;p.push(`<line class="axis" x1="${x}" y1="${oy}" x2="${x}" y2="${oy+rows*S}"/>`);}
+    else{const y=oy+cfg.axis.at*S;p.push(`<line class="axis" x1="${ox}" y1="${y}" x2="${ox+cols*S}" y2="${y}"/>`);}
+  }
+  const drawLine=(ln,isAns)=>{
+    const pts=ln.pts.map(([c,r])=>`${ox+c*S},${oy+r*S}`).join(' ');
+    p.push(`<polyline ${isAns?'class="ans" ':''}points="${pts}" fill="none" stroke="${ln.color}" stroke-width="${ln.w||5}" stroke-linejoin="round" stroke-linecap="round" ${ln.dash?'stroke-dasharray="2 8"':''}/>`);
+  };
+  (cfg.lines||[]).forEach(l=>drawLine(l,false));
+  (cfg.ansLines||[]).forEach(l=>drawLine(l,true));
+  (cfg.marks||[]).forEach(m=>p.push(`<circle cx="${ox+m.c*S}" cy="${oy+m.r*S}" r="${m.rr||7}" fill="${m.color}" ${m.stroke?`stroke="${m.stroke}" stroke-width="2.5"`:''}/>`));
+  (cfg.ansMarks||[]).forEach(m=>p.push(`<circle class="ans" cx="${ox+m.c*S}" cy="${oy+m.r*S}" r="${m.rr||7}" fill="${m.color}"/>`));
+  p.push(`<rect x="${ox}" y="${oy}" width="${cols*S}" height="${rows*S}" fill="none" stroke="#3a352c" stroke-width="2.5" rx="4"/>`);
+  return `<svg class="puz" viewBox="0 0 ${W} ${H}">${p.join('')}</svg>`;
+}
+/* ===== 좌표 변환 (정답 자동 계산) ===== */
+const reflectV=(pts,A)=>pts.map(([c,r])=>[2*A-c,r]);
+const reflectH=(pts,A)=>pts.map(([c,r])=>[c,2*A-r]);
+const translate=(pts,dc,dr)=>pts.map(([c,r])=>[c+dc,r+dr]);
+const rotateCW=(pts,cx,cy)=>pts.map(([c,r])=>[cx-(r-cy), cy+(c-cx)]);
+const reflectCellsV=(cells,A)=>cells.map(([c,r,col])=>[2*A-1-c,r,col]);
+const reflectCellsH=(cells,A)=>cells.map(([c,r,col])=>[c,2*A-1-r,col]);
+
+const C={blue:'var(--blue)',pink:'var(--pink)',mint:'var(--mint)',purple:'var(--purple)',
+  yellow:'var(--yellow)',orange:'var(--orange)',shape:'var(--shape)',red:'var(--red)',
+  gray:'var(--gray)',green:'var(--green)'};
+const CY=[C.blue,C.pink,C.mint,C.purple,C.yellow,C.orange];
+
+function page(stepLabel,title,lead,howto,bodyHTML){
+  return `<div class="page">
+    <div class="ptop"><span class="step">${stepLabel}</span>
+      <span class="nd">이름<span></span>&nbsp;&nbsp;날짜<span></span></span></div>
+    <h1 class="title">${title}</h1><p class="lead">${lead}</p>
+    ${howto?`<div class="howto">${howto}</div>`:''}${bodyHTML}
+    <div class="foot">RAON 학습 자료실 · 평면도형의 이동</div></div>`;
+}
+function item(q,inner){return `<div class="item"><p class="q">${q}</p>${inner}</div>`;}
+function pair(g,b){return `<div class="pairrow">
+  <div class="col"><small>이렇게</small>${buildSVG(g)}</div>
+  <div class="arrow">➜</div>
+  <div class="col"><small>똑같이</small>${buildSVG(b)}</div></div>`;}
+
+let HTML='';
+
+/* ===== 표지 ===== */
+HTML+=`<div class="page cover">
+  <span class="badge">수학 · 평면도형</span>
+  <h1>평면도형의 이동<br>한 걸음씩 따라하기</h1>
+  <p>쉬운 것부터 차근차근. 블록·색종이·거울을 함께 쓰면 더 좋아요.<br>한 단계를 충분히 반복한 뒤 다음으로 넘어가요.</p>
+  <div class="ladder">${[
+    ['1','모양 따라 놓기','블록·색종이로 똑같이 만들고 색칠하기'],
+    ['2','점 위에 옮겨 그리기','작은 점판에 똑같이 따라 그리기'],
+    ['3','한 칸 이동하기','점 → 선 → 도형, 한 칸씩 옮기기'],
+    ['4','색칠 대칭','칸을 색칠해 좌우·상하 대칭 만들기'],
+    ['5','선대칭 그리기','직선 → 사선 순서로 반쪽 완성하기'],
+    ['6','밀기 (평행이동)','모양은 그대로, 자리만 옮기기'],
+    ['7','뒤집기 (대칭이동)','거울처럼 뒤집어 그리기'],
+    ['8','돌리기 (회전)','기준점을 중심으로 돌리기'],
+  ].map(r=>`<div class="rung"><div class="n">${r[0]}</div><div class="tx"><b>${r[1]}</b><span>${r[2]}</span></div></div>`).join('')}</div>
+  <div class="foot">RAON 학습 자료실 · 평면도형의 이동</div></div>`;
+
+/* ===== 1단계 : 모양 따라 놓기 (9문제) ===== */
+{
+  const pats=[
+    [[0,0],[1,1],[2,2]],
+    [[0,0],[0,1],[0,2],[1,2]],
+    [[1,0],[0,1],[1,1],[2,1],[1,2]],
+    [[2,0],[1,1],[0,2]],
+    [[0,0],[1,0],[2,0],[1,1],[1,2]],
+    [[0,0],[1,0],[0,1],[1,1]],
+    [[0,0],[1,0],[1,1],[1,2],[2,2]],
+    [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1],[2,0]],
+    [[0,0],[2,0],[1,1],[0,2],[2,2]],
+  ];
+  const body=`<div class="grid3">`+pats.map((pat,i)=>{
+    const col=CY[i%6]; const cells=pat.map(([c,r])=>[c,r,col]);
+    return item(`${i+1}번`, pair({cols:3,rows:3,s:40,cells},{cols:3,rows:3,s:40,ansCells:cells}));
+  }).join('')+`</div>`;
+  HTML+=page('1단계 · 모양 따라 놓기','블록처럼 똑같이 놓아 보기',
+    '왼쪽 모양을 보고 오른쪽 빈칸에 똑같이 색칠하세요.',
+    '먼저 <b>블록·색종이 조각</b>으로 왼쪽과 똑같이 놓아 본 뒤 그대로 색칠해요. 칸 위치를 손가락으로 짚으며 확인합니다.',body);
+}
+
+/* ===== 2단계 : 점 위에 옮겨 그리기 (9문제) ===== */
+{
+  const paths=[
+    [[0,1],[2,1],[2,2],[0,2]],
+    [[1,0],[1,2],[3,2]],
+    [[0,0],[0,2],[2,2],[2,0]],
+    [[0,3],[1,1],[2,3]],
+    [[0,0],[2,0],[2,2]],
+    [[0,1],[1,1],[1,0],[2,0]],
+    [[0,2],[1,1],[2,2],[3,1]],
+    [[0,0],[3,0],[0,3]],
+    [[3,0],[1,0],[1,2],[3,2]],
+  ];
+  const body=`<div class="grid3">`+paths.map((pts,i)=>{
+    return item(`${i+1}번`, pair(
+      {cols:3,rows:3,grid:'dots',s:40,lines:[{pts,color:C.red,w:4}]},
+      {cols:3,rows:3,grid:'dots',s:40,ansLines:[{pts,color:C.red,w:4}]}));
+  }).join('')+`</div>`;
+  HTML+=page('2단계 · 점 위에 옮겨 그리기','점을 이어 똑같이 그리기',
+    '왼쪽 점판의 선을 보고, 오른쪽 점판에 똑같이 이어 그리세요.',
+    '출발점에 연필을 대고 <b>지나가는 점을 하나씩</b> 짚으며 천천히 이어요. 작은 점판부터 익숙해지면 됩니다.',body);
+}
+
+/* ===== 3단계 : 한 칸 이동하기 (9문제) ===== */
+{
+  const items3=[
+    {q:'점 → 오른쪽 한 칸',k:'dot',b:[1,1],dc:1,dr:0},
+    {q:'점 → 아래로 한 칸',k:'dot',b:[2,1],dc:0,dr:1},
+    {q:'점 → 위로 한 칸',k:'dot',b:[2,3],dc:0,dr:-1},
+    {q:'선 → 아래로 한 칸',k:'line',b:[[1,1],[3,1]],dc:0,dr:1},
+    {q:'선 → 오른쪽 한 칸',k:'line',b:[[1,1],[1,3]],dc:1,dr:0},
+    {q:'선 → 위로 한 칸',k:'line',b:[[0,2],[2,2]],dc:0,dr:-1},
+    {q:'도형 → 오른쪽 한 칸',k:'shape',b:[[1,1],[3,1],[3,3],[1,3],[1,1]],dc:1,dr:0},
+    {q:'도형 → 아래로 한 칸',k:'shape',b:[[0,0],[2,0],[2,1],[1,1],[1,2],[0,2],[0,0]],dc:0,dr:1},
+    {q:'도형 → 오른쪽 한 칸',k:'shape',b:[[1,1],[3,1],[1,3],[1,1]],dc:1,dr:0},
+  ];
+  const body=`<div class="grid3">`+items3.map((it,i)=>{
+    let cfg;
+    if(it.k==='dot'){
+      cfg={cols:4,rows:4,grid:'dots',s:42,
+        marks:[{c:it.b[0],r:it.b[1],color:C.gray,rr:8}],
+        ansMarks:[{c:it.b[0]+it.dc,r:it.b[1]+it.dr,color:C.red,rr:8}]};
+    } else if(it.k==='line'){
+      cfg={cols:4,rows:4,grid:'dots',s:42,
+        lines:[{pts:it.b,color:C.gray,w:5}],
+        ansLines:[{pts:translate(it.b,it.dc,it.dr),color:C.shape,w:5}]};
+    } else {
+      cfg={cols:4,rows:4,grid:'lines',s:42,
+        lines:[{pts:it.b,color:C.gray,w:5}],
+        ansLines:[{pts:translate(it.b,it.dc,it.dr),color:C.shape,w:5}]};
+    }
+    return item(`${i+1}. <span style="color:var(--red)">${it.q}</span>`, buildSVG(cfg));
+  }).join('')+`</div>`;
+  HTML+=page('3단계 · 한 칸 이동하기','한 칸씩 옮겨 보기',
+    '회색은 처음 위치예요. 화살표 방향으로 <b>한 칸</b> 옮긴 자리에 그리세요.',
+    '<b>점 → 선 → 도형</b> 순서로 연습해요. “오른쪽 한 칸”은 옆으로 한 칸, “아래로 한 칸”은 바로 아래 한 칸. 손가락으로 세어보고 그려요.',body);
+}
+
+/* ===== 4단계 : 색칠 대칭 (좌우4 + 상하2) ===== */
+{
+  const Vs=[
+    [[2,0],[1,1],[2,1],[2,2],[1,3],[2,3],[2,4]],
+    [[0,0],[1,0],[2,0],[2,1],[1,2],[2,2],[2,3],[2,4]],
+    [[2,0],[2,1],[0,2],[1,2],[2,2],[2,3],[2,4]],
+    [[1,0],[2,0],[2,1],[2,2],[2,3],[1,4],[2,4]],
+    [[1,0],[2,0],[2,1],[1,1],[2,2],[2,3],[2,4]],
+    [[2,0],[2,1],[0,2],[1,2],[2,2],[2,3],[1,3],[2,4]],
+  ];
+  const Hs=[
+    [[1,0],[0,1],[1,1],[2,1],[2,2],[3,2],[4,2]],
+    [[2,0],[2,1],[0,2],[1,2],[2,2],[3,2],[4,2]],
+    [[0,0],[4,0],[1,1],[2,1],[3,1],[2,2]],
+  ];
+  const vbody=`<div class="grid3">`+Vs.map((sh,i)=>{
+    const col=CY[i%6]; const cells=sh.map(([c,r])=>[c,r,col]);
+    return item(`${i+1}번 · <b>좌우</b> 똑같게`,
+      buildSVG({cols:6,rows:5,s:38,axis:{dir:'v',at:3},cells,ansCells:reflectCellsV(cells,3)}));
+  }).join('')+`</div>`;
+  const hbody=`<div class="grid3">`+Hs.map((sh,i)=>{
+    const col=CY[(i+1)%6]; const cells=sh.map(([c,r])=>[c,r,col]);
+    return item(`${i+7}번 · <b>위아래</b> 똑같게`,
+      buildSVG({cols:5,rows:6,s:38,axis:{dir:'h',at:3},cells,ansCells:reflectCellsH(cells,3)}));
+  }).join('')+`</div>`;
+  HTML+=page('4단계 · 색칠 대칭','색칠해서 대칭 만들기',
+    '점선을 거울이라 생각하고, 반대쪽에도 똑같이 색칠하세요.',
+    '점선에서 <b>같은 거리에 있는 반대쪽 칸</b>을 찾아 색칠하면 대칭이 돼요. 그리기 부담이 없어 가장 쉬운 대칭 연습입니다.',
+    `<div class="subhd">◀ ▶  좌우 대칭</div>${vbody}<div class="subhd">▲ ▼  위아래 대칭</div>${hbody}`);
+}
+
+/* ===== 5단계 : 선대칭 그리기 (6문제) ===== */
+{
+  const shs=[
+    {q:'직선',pts:[[3,1],[1,1],[1,5],[3,5]]},
+    {q:'직선',pts:[[3,0],[1,3],[3,6]]},
+    {q:'직선',pts:[[3,1],[1,1],[1,4],[2,5],[3,5]]},
+    {q:'사선',pts:[[3,1],[1,2],[1,4],[3,5]]},
+    {q:'사선',pts:[[3,0],[2,0],[2,2],[1,2],[1,4],[3,4]]},
+    {q:'사선',pts:[[3,1],[1,2],[3,3],[1,4],[3,5]]},
+  ];
+  const body=`<div class="grid3">`+shs.map((s,i)=>item(`${i+1}번 · ${s.q} 도형`,
+    buildSVG({cols:6,rows:6,s:40,axis:{dir:'v',at:3},
+      lines:[{pts:s.pts,color:C.shape,w:5}],
+      ansLines:[{pts:reflectV(s.pts,3),color:C.green,w:5}]}))).join('')+`</div>`;
+  HTML+=page('5단계 · 선대칭 그리기','거울처럼 반쪽 완성하기',
+    '점선을 기준으로 반대쪽에 똑같은 반쪽을 그려 도형을 완성하세요.',
+    '<b>직선 도형(1~3번)</b>을 충분히 한 뒤 <b>사선 도형(4~6번)</b>으로 넘어가요. 점선에 닿은 점은 그대로 두고, 나머지 점을 반대편 같은 칸에 찍어 이으면 됩니다. (곡선은 더 익숙해진 뒤에)',body);
+}
+
+/* ===== 6단계 : 밀기(평행이동) (6문제) ===== */
+{
+  const shs=[
+    {pts:[[0,0],[2,0],[2,2],[0,2],[0,0]],dc:5,t:'오른쪽으로 5칸'},
+    {pts:[[0,0],[2,0],[2,1],[1,1],[1,3],[0,3],[0,0]],dc:4,t:'오른쪽으로 4칸'},
+    {pts:[[0,0],[3,0],[0,3],[0,0]],dc:4,t:'오른쪽으로 4칸'},
+    {pts:[[0,0],[1,0],[1,1],[2,1],[2,2],[0,2],[0,0]],dc:5,t:'오른쪽으로 5칸'},
+    {pts:[[0,0],[1,0],[1,3],[0,3],[0,0]],dc:5,t:'오른쪽으로 5칸'},
+    {pts:[[0,1],[2,1],[2,3],[0,3],[0,1]],dc:5,t:'오른쪽으로 5칸'},
+  ];
+  const body=`<div class="grid2">`+shs.map((s,i)=>item(
+    `${i+1}번 · <span style="color:var(--red)">→ ${s.t}</span> 밀기`,
+    buildSVG({cols:8,rows:4,s:40,
+      lines:[{pts:s.pts,color:C.gray,w:5}],
+      ansLines:[{pts:translate(s.pts,s.dc,0),color:C.shape,w:5}]}))).join('')+`</div>`;
+  HTML+=page('6단계 · 밀기 (평행이동)','모양은 그대로, 자리만 옮기기',
+    '회색 도형을 화살표 방향으로 민 자리에 똑같은 모양으로 그리세요.',
+    '<b>모양·크기·방향 모두 그대로</b>예요. 도형의 한 점을 정해 “몇 칸 움직였는지” 세어보고, 나머지 점도 같은 만큼 옮기면 됩니다.',body);
+}
+
+/* ===== 7단계 : 뒤집기(대칭이동) (4문제) ===== */
+{
+  const Vs=[
+    [[0,0],[3,0],[0,3],[0,0]],
+    [[0,0],[2,0],[2,1],[1,1],[1,3],[0,3],[0,0]],
+  ];
+  const Hs=[
+    [[0,0],[2,0],[2,2],[0,2],[0,0]],
+    [[0,0],[3,0],[0,2],[0,0]],
+  ];
+  const vbody=`<div class="grid2">`+Vs.map((pts,i)=>item(`${i+1}번 · 점선 거울에 <b>좌우로 뒤집기</b>`,
+    buildSVG({cols:8,rows:4,s:40,axis:{dir:'v',at:4},
+      lines:[{pts,color:C.shape,w:5}],ansLines:[{pts:reflectV(pts,4),color:C.green,w:5}]}))).join('')+`</div>`;
+  const hbody=`<div class="grid2">`+Hs.map((pts,i)=>item(`${i+3}번 · 점선 거울에 <b>위아래로 뒤집기</b>`,
+    buildSVG({cols:5,rows:6,s:40,axis:{dir:'h',at:3},
+      lines:[{pts,color:C.shape,w:5}],ansLines:[{pts:reflectH(pts,3),color:C.green,w:5}]}))).join('')+`</div>`;
+  HTML+=page('7단계 · 뒤집기 (대칭이동)','거울에 비친 것처럼 뒤집기',
+    '점선을 거울이라 생각하고, 거울에 비친 모양을 반대쪽에 그리세요.',
+    '뒤집으면 <b>방향이 거꾸로</b> 돼요. 실제로 <b>거울·투명필름</b>을 점선에 대보거나 점선에서 <b>접어서</b> 확인하면 쉬워요.',
+    `<div class="subhd">◀ ▶  좌우로 뒤집기</div>${vbody}<div class="subhd">▲ ▼  위아래로 뒤집기</div>${hbody}`);
+}
+
+/* ===== 8단계 : 돌리기(회전) (4문제) ===== */
+{
+  const shs=[
+    [[3,3],[5,3],[5,2]],
+    [[3,3],[3,1],[4,1]],
+    [[3,3],[5,3],[5,4],[4,4]],
+    [[3,3],[1,3],[1,2]],
+  ];
+  const body=`<div class="grid2">`+shs.map((pts,i)=>item(
+    `${i+1}번 · 빨간 점 중심 <b>시계방향 90°</b>`,
+    buildSVG({cols:6,rows:6,s:42,
+      lines:[{pts,color:C.shape,w:5}],
+      ansLines:[{pts:rotateCW(pts,3,3),color:C.green,w:5}],
+      marks:[{c:3,r:3,color:'#fff',rr:7,stroke:C.red}]}))).join('')+`</div>`;
+  HTML+=page('8단계 · 돌리기 (회전)','기준점을 중심으로 돌리기',
+    '빨간 점(기준점)을 중심으로 도형을 시계방향으로 90° 돌린 모양을 그리세요.',
+    '회전은 가장 어려워요. <b>기준점</b>을 먼저 확인하고, 기준점에 연필 끝을 꽂고 <b>종이를 직접 돌려보면</b> 어디로 가는지 눈으로 알 수 있어요. 투명필름에 그려 돌려보는 것도 좋아요.',body);
+}
+
+document.getElementById('app').innerHTML=HTML;
+function toggleAns(){
+  document.body.classList.toggle('show-ans');
+  const b=document.getElementById('ansBtn'), on=document.body.classList.contains('show-ans');
+  b.textContent=on?'정답 숨기기':'정답 보기'; b.classList.toggle('on',on);
+}
+</script>
+</body>
+</html>
