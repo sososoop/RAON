@@ -89,7 +89,6 @@
 
   .pic{display:flex;justify-content:center;margin:4px 0 6px;}
   .pic svg{width:120px;height:120px;}
-  .listen{display:inline-flex;align-items:center;gap:6px;background:var(--blue-soft);color:var(--blue);border-radius:12px;padding:4px 12px;font-family:var(--display);font-size:16px;}
 
   /* 1. 처럼 찾기 */
   .words{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0 6px;}
@@ -306,16 +305,6 @@
   const ding = () => tone([660, 880]);
   const oops = () => tone([300, 240], 0.14);
   const fanfare = () => tone([523, 659, 784, 1047], 0.13);
-  function speak(text) {
-    try {
-      if (!('speechSynthesis' in window)) return;
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR'; u.rate = 0.85;
-      speechSynthesis.speak(u);
-    } catch(e) {}
-  }
-  const canSpeak = 'speechSynthesis' in window;
 
   /* ---------- 도우미 ---------- */
   const $app = document.getElementById('app');
@@ -426,8 +415,7 @@
     shell(`
       <p class="ask">문장을 읽고, <b>'~처럼'</b>이 들어간 낱말을 눌러요.</p>
       <div class="pic">${mush(sim.m)}</div>
-      <div class="words">${words.map((w, i) => `<button class="word" data-act="find" data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div>
-      ${canSpeak ? `<div style="text-align:center"><button class="listen" data-act="say" data-say="${esc(sentence(sim))}">🔊 문장 듣기</button></div>` : ''}`);
+      <div class="words">${words.map((w, i) => `<button class="word" data-act="find" data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div>`);
   }
 
   /* 2. 세 칸 맞추기 */
@@ -481,7 +469,6 @@
     shell(`
       <p class="ask">맞으면 <b>O</b>, 틀리면 <b>X</b>를 눌러요.</p>
       <div class="quiz">${esc(o.q)}</div>
-      ${canSpeak ? `<div style="text-align:center;margin:-6px 0 12px"><button class="listen" data-act="say" data-say="${esc(o.q)}">🔊 문장 듣기</button></div>` : ''}
       <div class="ox"><button class="o" data-act="ox" data-v="1" aria-label="맞아요 O">O</button><button class="x" data-act="ox" data-v="0" aria-label="틀려요 X">X</button></div>`);
   }
 
@@ -551,7 +538,6 @@
     if (act === 'map') { state.view = 'map'; return render(); }
     if (act === 'notebook') { state.view = 'notebook'; return render(); }
     if (act === 'sound') { state.sound = !state.sound; save(); b.textContent = state.sound ? '🔊' : '🔈'; return; }
-    if (act === 'say') return speak(b.dataset.say);
     if (act === 'reset') { const keep = state.sound; state = fresh(); state.sound = keep; save(); return render(); }
     if (act === 'stage') { state.view = 'stage'; state.stage = +b.dataset.i; state.q = 0; state.stageStars = 0; return render(); }
     if (act === 'next') { if (round && round.star) state.stageStars = (state.stageStars || 0) + 1; state.q++; return render(); }
@@ -561,7 +547,6 @@
       const sim = SIMS[state.q];
       if (b.dataset.w === sim.like) { const thing = sim.like.replace('처럼', ''); right(`<b style="color:var(--coral)">${esc(sim.like)}</b><br>버섯이 ${esc(thing)}${josa(thing, '과', '와')} 닮았다는 뜻이에요.`, b); }
       else wrong(`'처럼'이 붙은 낱말을 찾아봐요. 끝 글자를 잘 보세요!`, b);
-      if (round.solved) speak(sentence(sim));
     }
     if (act === 'slotpick') {
       const i = round.filled.findIndex(v => v == null);
@@ -569,7 +554,7 @@
       const sim = SIMS[SLOT_SET[state.q]];
       drawSlot(sim);
       if (round.filled.filter(v => v != null).length === 3) {
-        if (round.filled.join() === '0,1,2') { right(`${esc(round.parts.join(' '))}`, document.querySelector('.slots')); speak(sentence(sim)); }
+        if (round.filled.join() === '0,1,2') { right(`${esc(round.parts.join(' '))}`, document.querySelector('.slots')); }
         else { wrong(`<b>어떤 버섯이</b> → <b>무엇처럼</b> → <b>어때요</b> 차례예요. 칸을 눌러 조각을 빼 보세요.`, document.querySelector('.slots')); }
       }
     }
@@ -589,7 +574,7 @@
     if (act === 'namecheck') {
       const n = NAMES[state.q];
       const pick = [...round.sel].sort((a, b) => a - b).join();
-      if (pick === n.ans.join()) { right(`숨은 낱말은 <b style="color:var(--mint)">${n.word}</b>!<br>${n.say}`, document.querySelector('.syll')); speak(n.say); }
+      if (pick === n.ans.join()) { right(`숨은 낱말은 <b style="color:var(--mint)">${n.word}</b>!<br>${n.say}`, document.querySelector('.syll')); }
       else wrong(`버섯 그림을 보고, 무엇을 닮았는지 떠올려 봐요. 이름을 천천히 끊어 읽어 보세요.`, document.querySelector('.syll'));
     }
     if (act === 'pick') {
@@ -598,7 +583,7 @@
       if (i === p.ans) {
         document.getElementById('blank').textContent = p.ch[i][1];
         const line = `버섯이 ${p.ch[i][1]}처럼 ${p.how}.`;
-        right(line, b); speak(line);
+        right(line, b);
       } else wrong(`${esc(p.ch[i][1])}${josa(p.ch[i][1], '은', '는')} 이 버섯과 닮지 않았어요. 버섯 색깔과 모양을 다시 봐요.`, b);
     }
     if (act === 'ox') {
