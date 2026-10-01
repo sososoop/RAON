@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>버섯 탐험대 — '~처럼' 학습지</title>
+<style>
+  @font-face{font-family:'Pretendard';font-weight:400;font-display:swap;
+    src:local('Pretendard Regular'),url(https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2) format('woff2');}
+  @font-face{font-family:'Pretendard';font-weight:600;font-display:swap;
+    src:local('Pretendard SemiBold'),url(https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-SemiBold.woff2) format('woff2');}
+  @font-face{font-family:'Pretendard';font-weight:700;font-display:swap;
+    src:local('Pretendard Bold'),url(https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Bold.woff2) format('woff2');}
+  @font-face{font-family:'Pretendard';font-weight:800;font-display:swap;
+    src:local('Pretendard ExtraBold'),url(https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-ExtraBold.woff2) format('woff2');}
+
+  :root{
+    --ink:#2d2a32;
+    --sub:#6f6a78;
+    --bg:#F4FBF8;
+    --paper:#FFFFFF;
+    --line:#E3E8EE;
+    --coral:#F2665A;   --coral-soft:#FFEDEA;
+    --lemon:#F5B700;   --lemon-soft:#FFF7D6;
+    --mint:#20A58A;    --mint-soft:#E2F6F0;
+    --sky:#3C8DDE;     --sky-soft:#E6F1FC;
+    --grape:#8B6BD9;   --grape-soft:#F0EBFC;
+    --blank:#3C8DDE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    font-size:19px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .sheet{
+    width:210mm;min-height:297mm;
+    margin:0 auto 10mm;
+    padding:12mm 13mm 11mm;
+    background:var(--paper);
+    position:relative;
+    break-after:page;
+  }
+  .sheet:last-child{break-after:auto;}
+  .pageno{position:absolute;bottom:6mm;left:0;right:0;text-align:center;font-size:12px;color:#b4b9c2;}
+
+  /* 머리 */
+  header.top{
+    background:linear-gradient(120deg,#FFE7E3 0%,#FFF6D2 55%,#E2F6F0 100%);
+    border-radius:22px;
+    padding:16px 22px 14px;
+    display:flex;align-items:center;gap:16px;
+    margin-bottom:14px;
+  }
+  header.top .ttl{flex:1;}
+  header.top .kicker{display:inline-block;background:#fff;color:var(--coral);font-weight:800;font-size:14px;
+    padding:2px 12px;border-radius:999px;margin-bottom:4px;}
+  header.top h1{margin:0;font-size:30px;line-height:1.3;font-weight:800;letter-spacing:-0.01em;}
+  header.top h1 em{font-style:normal;color:var(--coral);}
+  .who{display:flex;gap:10px;margin-top:8px;font-size:15px;font-weight:600;color:var(--sub);}
+  .who span{background:#fff;border-radius:999px;padding:3px 14px;}
+
+  /* 오늘의 배움 */
+  .learn{
+    border:3px dashed #F7B9B2;border-radius:18px;background:#FFF8F7;
+    padding:12px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:center;
+  }
+  .learn .badge{flex:0 0 auto;width:64px;height:64px;border-radius:50%;background:var(--coral);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;line-height:1.1;text-align:center;}
+  .learn p{margin:0;font-size:17.5px;line-height:1.6;}
+  .learn b{color:var(--coral);}
+  .formula{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px;}
+  .chip{display:inline-block;border-radius:10px;padding:1px 12px;font-weight:700;font-size:16px;}
+  .chip.a{background:var(--mint-soft);color:var(--mint);}
+  .chip.b{background:var(--coral-soft);color:var(--coral);}
+  .chip.c{background:var(--sky-soft);color:var(--sky);}
+  .plus{color:#c3c7cf;font-weight:800;}
+
+  /* 지문 */
+  .story{
+    background:#FFFDF6;border:2px solid #F3E4B5;border-radius:20px;
+    padding:16px 22px 14px;position:relative;
+  }
+  .story h2{margin:0 0 8px;font-size:23px;font-weight:800;color:#7a5a00;display:flex;align-items:center;gap:8px;}
+  .story p{margin:0 0 8px;font-size:20px;line-height:1.95;word-break:keep-all;text-indent:0.6em;}
+  .story p:last-child{margin-bottom:0;}
+  .story .pn{display:inline-block;width:22px;height:22px;border-radius:50%;background:#F5B700;color:#fff;
+    font-size:13px;font-weight:800;text-align:center;line-height:22px;margin-right:4px;text-indent:0;vertical-align:2px;}
+  .read-check{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:15px;color:var(--sub);font-weight:600;}
+  .read-check i{display:inline-block;width:22px;height:22px;border:2px solid #E6C766;border-radius:50%;}
+
+  /* 활동 */
+  section.act{
+    border-radius:20px;padding:14px 20px 16px;margin-top:14px;border:2px solid var(--line);
+    break-inside:avoid;
+  }
+  .act-head{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800;margin-bottom:4px;}
+  .act-head .n{width:34px;height:34px;border-radius:11px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;}
+  .tip{font-size:16px;color:var(--sub);margin:0 0 10px 44px;line-height:1.5;}
+  .c-coral{border-color:#FBC9C3;background:#FFFAF9;} .c-coral .act-head{color:var(--coral);} .c-coral .n{background:var(--coral);}
+  .c-lemon{border-color:#F6DE8A;background:#FFFDF3;} .c-lemon .act-head{color:#B88700;} .c-lemon .n{background:var(--lemon);}
+  .c-mint{border-color:#A8E0D2;background:#F8FDFB;} .c-mint .act-head{color:var(--mint);} .c-mint .n{background:var(--mint);}
+  .c-sky{border-color:#B3D3F4;background:#F8FBFF;} .c-sky .act-head{color:var(--sky);} .c-sky .n{background:var(--sky);}
+  .c-grape{border-color:#D3C6F3;background:#FBF9FF;} .c-grape .act-head{color:var(--grape);} .c-grape .n{background:var(--grape);}
+
+  .wbox{display:inline-block;min-width:70px;height:46px;border:2.5px dashed var(--blank);border-radius:10px;vertical-align:middle;background:#fff;}
+  .wbox.w2{min-width:120px;} .wbox.w3{min-width:170px;}
+  .line-ans{display:inline-block;border-bottom:2.5px solid var(--blank);min-width:150px;height:1.4em;vertical-align:bottom;}
+
+  /* 활동1 */
+  .count{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:19px;font-weight:600;margin-left:44px;}
+  .stars{display:flex;gap:6px;}
+  .stars span{width:30px;height:30px;border:2px solid #F7B9B2;border-radius:8px;background:#fff;}
+
+  /* 활동2 표 */
+  table.sim{width:100%;border-collapse:separate;border-spacing:0 10px;font-size:18px;}
+  table.sim th{font-size:16px;font-weight:800;padding:6px 8px;border-radius:12px;text-align:center;}
+  table.sim th.a{background:var(--mint-soft);color:var(--mint);}
+  table.sim th.b{background:var(--coral-soft);color:var(--coral);}
+  table.sim th.c{background:var(--sky-soft);color:var(--sky);}
+  table.sim td{background:#fff;border-top:2px solid var(--line);border-bottom:2px solid var(--line);padding:6px 10px;vertical-align:middle;height:70px;}
+  table.sim td:first-child{border-left:2px solid var(--line);border-radius:14px 0 0 14px;}
+  table.sim td:last-child{border-right:2px solid var(--line);border-radius:0 14px 14px 0;}
+  table.sim td.m{display:flex;align-items:center;gap:8px;font-weight:700;height:58px;border:none;}
+  td.mush{width:34%;}
+  .mrow{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17.5px;line-height:1.3;}
+  .mrow svg{width:46px;height:46px;flex:0 0 auto;}
+  td.like{width:28%;text-align:center;}
+  td.how{text-align:center;}
+  .given{font-weight:700;}
+  .like .given{color:var(--coral);}
+  .ex-tag{display:inline-block;background:var(--lemon);color:#fff;font-size:12px;font-weight:800;border-radius:6px;padding:0 6px;margin-right:4px;vertical-align:2px;}
+  .tbl-row-ex td{background:#FFFBEA;}
+  .bank{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;background:#fff;border:2px dashed #F6DE8A;border-radius:14px;padding:8px 12px;margin-top:4px;font-size:17px;}
+  .bank .lbl{font-weight:800;color:#B88700;margin-right:4px;}
+  .bank .w{background:var(--lemon-soft);border-radius:8px;padding:0 10px;font-weight:700;}
+
+  /* 활동3 이름 속 숨은 낱말 */
+  .names{display:grid;grid-template-columns:1fr;gap:14px;}
+  .name-card{display:flex;align-items:center;gap:16px;background:#fff;border:2px solid #A8E0D2;border-radius:16px;padding:14px 18px;}
+  .name-card svg{width:70px;height:70px;flex:0 0 auto;}
+  .name-big{font-size:30px;font-weight:800;letter-spacing:0.08em;}
+  .name-card .q{font-size:17.5px;margin-top:2px;}
+
+  /* 활동4 줄긋기 */
+  .match{display:grid;grid-template-columns:1fr 130px 1fr;align-items:center;row-gap:20px;margin:4px 6px 0;}
+  .mL,.mR{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;}
+  .mL{justify-content:flex-end;}
+  .mL .pic{font-size:24px;}
+  .mL .card,.mR .card{background:#fff;border:2px solid #B3D3F4;border-radius:12px;padding:4px 14px;min-width:150px;text-align:center;}
+  .mL .card b{color:var(--coral);}
+  .dot{width:16px;height:16px;border-radius:50%;background:var(--sky);flex:0 0 auto;}
+
+  /* 활동5 문장 만들기 */
+  .make{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .mk{background:#fff;border:2px solid #D3C6F3;border-radius:16px;padding:14px 14px;display:flex;flex-direction:column;gap:10px;}
+  .mk .wbox{min-width:96px;}
+  .mk .top{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--sub);}
+  .mk .top svg{width:46px;height:46px;flex:0 0 auto;}
+  .mk .sent{font-size:19px;font-weight:700;white-space:nowrap;}
+  .mk .hint{font-size:14.5px;color:var(--sub);}
+  .mk .hint span{background:var(--grape-soft);color:var(--grape);border-radius:6px;padding:0 6px;margin-right:3px;font-weight:700;}
+
+  /* 활동6 OX */
+  ol.ox{list-style:none;margin:0;padding:0;}
+  ol.ox li{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid #FBC9C3;border-radius:14px;padding:10px 14px;margin:12px 0;font-size:18.5px;}
+  ol.ox li .no{width:28px;height:28px;border-radius:50%;background:var(--coral-soft);color:var(--coral);font-weight:800;text-align:center;line-height:28px;font-size:15px;flex:0 0 auto;}
+  ol.ox li .t{flex:1;}
+  .oxbox{display:flex;gap:8px;}
+  .oxbox span{width:40px;height:40px;border-radius:12px;border:2.5px solid #F2B6AF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#F2B6AF;background:#fff;}
+
+  .trace{margin-top:10px;background:#fff;border:2px solid #FBC9C3;border-radius:14px;padding:10px 14px;}
+  .trace .lbl{font-size:16px;font-weight:800;color:var(--coral);margin-bottom:4px;}
+  .trace .row{font-size:30px;font-weight:700;letter-spacing:0.06em;line-height:1.9;}
+  .trace .row.ghost{color:#D9DDE3;}
+  .trace .row.empty{border-bottom:2px dashed #E6C0BB;height:56px;}
+
+  /* 활동7 나만의 버섯 */
+  .mine{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;}
+  .draw{background:#fff;border:2.5px dashed #A8E0D2;border-radius:18px;min-height:290px;position:relative;}
+  .draw .lbl{position:absolute;top:8px;left:12px;font-size:14px;color:#9BB8B0;font-weight:700;}
+  .mine .lines{display:flex;flex-direction:column;gap:22px;justify-content:center;font-size:19px;font-weight:700;}
+  .mine .lines .l{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;line-height:1.6;}
+
+  /* 정답 */
+  .ans h2{font-size:22px;margin:0 0 8px;color:var(--mint);font-weight:800;}
+  .ans .story p{font-size:16.5px;line-height:1.8;}
+  mark.l{background:#FFE1DC;color:#D9483C;font-weight:800;padding:1px 4px;border-radius:5px;}
+  mark.h{background:#DDEBFB;color:#2C6CB0;font-weight:700;padding:1px 4px;border-radius:5px;}
+  .ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .ans-box{background:#F8FDFB;border:2px solid #A8E0D2;border-radius:14px;padding:10px 14px;font-size:15.5px;line-height:1.65;}
+  .ans-box h3{margin:0 0 4px;font-size:16px;color:var(--mint);}
+  .ans-box b{color:var(--coral);}
+  .teacher{margin-top:12px;background:#FFFDF3;border:2px solid #F6DE8A;border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.65;}
+  .teacher h3{margin:0 0 4px;font-size:16px;color:#B88700;}
+  .teacher ul{margin:0;padding-left:20px;}
+
+  .legend{display:flex;gap:14px;font-size:14px;color:var(--sub);margin:4px 0 8px;}
+
+  @page{size:A4;margin:0;}
+  @media print{
+    body{background:#fff;}
+    .sheet{margin:0;box-shadow:none;height:297mm;min-height:0;overflow:hidden;}
+  }
+  @media screen and (max-width:820px){
+    .sheet{width:auto;min-height:0;margin:0 0 12px;padding:18px 16px;}
+    .make,.mine,.ans-grid{grid-template-columns:1fr;}
+    .match{grid-template-columns:1fr 50px 1fr;}
+    .mL .card,.mR .card{min-width:0;}
+  }
+  @media screen and (min-width:821px){
+    body{padding:10mm 0;}
+    .sheet{box-shadow:0 4px 24px rgba(40,60,80,.08);border-radius:6px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- 버섯 그림 (재사용) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- 붉은사슴뿔버섯 -->
+    <symbol id="m-deer" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="92" rx="30" ry="5" fill="#E7EDE9"/>
+      <g fill="none" stroke="#F2665A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M50 90 L50 58"/>
+        <path d="M50 62 L32 40 L24 18"/>
+        <path d="M32 40 L40 22"/>
+        <path d="M50 62 L68 40 L76 18"/>
+        <path d="M68 40 L60 22"/>
+        <path d="M50 58 L50 30"/>
+      </g>
+      <g fill="#FF8A7E"><circle cx="24" cy="18" r="4.5"/><circle cx="40" cy="22" r="4.5"/><circle cx="76" cy="18" r="4.5"/><circle cx="60" cy="22" r="4.5"/><circle cx="50" cy="30" r="4.5"/></g>
+    </symbol>
+    <!-- 노란다발버섯 -->
+    <symbol id="m-bunch" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="92" rx="34" ry="5" fill="#E7EDE9"/>
+      <g fill="#FFF3C4" stroke="#E2B53A" stroke-width="2">
+        <path d="M30 90 C30 70 34 58 36 50 L42 50 C40 60 38 72 38 90 Z"/>
+        <path d="M46 90 C46 66 48 52 49 42 L55 42 C54 54 54 68 54 90 Z"/>
+        <path d="M62 90 C62 72 64 62 66 54 L72 54 C70 64 70 76 70 90 Z"/>
+      </g>
+      <g fill="#F5C518" stroke="#D9A400" stroke-width="2">
+        <path d="M22 52 C22 36 52 36 54 52 Q38 56 22 52 Z"/>
+        <path d="M36 44 C36 22 70 22 70 44 Q52 49 36 44 Z"/>
+        <path d="M54 56 C54 40 84 40 86 56 Q70 60 54 56 Z"/>
+      </g>
+      <g fill="#FFE27A"><circle cx="46" cy="32" r="3"/><circle cx="60" cy="34" r="2.5"/><circle cx="68" cy="48" r="2.5"/><circle cx="34" cy="46" r="2.5"/></g>
+    </symbol>
+    <!-- 독우산광대버섯 -->
+    <symbol id="m-umb" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="93" rx="26" ry="5" fill="#E7EDE9"/>
+      <path d="M44 90 L46 50 L54 50 L56 90 Z" fill="#FFFFFF" stroke="#AEB8C2" stroke-width="2.2"/>
+      <path d="M38 92 Q50 84 62 92" fill="#FFFFFF" stroke="#AEB8C2" stroke-width="2.2"/>
+      <path d="M40 62 Q50 70 60 62 L58 58 Q50 63 42 58 Z" fill="#FFFFFF" stroke="#AEB8C2" stroke-width="2"/>
+      <path d="M12 50 C14 20 86 20 88 50 Q50 58 12 50 Z" fill="#FFFFFF" stroke="#AEB8C2" stroke-width="2.4"/>
+      <path d="M50 22 L50 52 M30 28 L22 50 M70 28 L78 50" stroke="#E3E8EE" stroke-width="2" fill="none"/>
+    </symbol>
+    <!-- 화경버섯 -->
+    <symbol id="m-glow" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="#EAFBC8" opacity=".85"/>
+      <circle cx="50" cy="50" r="34" fill="#DAF7A3" opacity=".7"/>
+      <path d="M20 54 C18 28 76 22 82 46 C70 50 60 56 54 70 L46 70 C42 60 32 56 20 54 Z" fill="#C9B79A" stroke="#9C8668" stroke-width="2.2"/>
+      <path d="M46 70 L54 70 L56 84 L44 84 Z" fill="#E9DCC6" stroke="#9C8668" stroke-width="2"/>
+      <g fill="#F5D000"><path d="M16 22 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z"/><path d="M84 20 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z"/><path d="M82 74 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z"/></g>
+    </symbol>
+    <!-- 기본 버섯 (빈 색) -->
+    <symbol id="m-plain" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="92" rx="26" ry="5" fill="#E7EDE9"/>
+      <path d="M42 90 L44 54 L56 54 L58 90 Z" fill="#FFF8EC" stroke="#C9BBA4" stroke-width="2"/>
+      <path d="M14 56 C14 22 86 22 86 56 Q50 64 14 56 Z" fill="currentColor" stroke="rgba(0,0,0,.18)" stroke-width="2"/>
+      <circle cx="34" cy="42" r="5" fill="#fff" opacity=".7"/><circle cx="58" cy="34" r="4" fill="#fff" opacity=".7"/><circle cx="68" cy="46" r="3.5" fill="#fff" opacity=".7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============ 1쪽 : 지문 ============ -->
+<div class="sheet">
+  <header class="top">
+    <div class="ttl">
+      <span class="kicker">🔍 버섯 탐험대 · 읽기 학습지</span>
+      <h1>숲속의 예쁜 거짓말쟁이, <em>독버섯</em></h1>
+      <div class="who"><span>이름 : ____________</span><span>날짜 : ______ 월 ______ 일</span></div>
+    </div>
+    <svg width="96" height="96"><use href="#m-deer" x="0" y="0" width="48" height="48"/><use href="#m-umb" x="40" y="4" width="56" height="56"/><use href="#m-bunch" x="4" y="44" width="50" height="50"/><use href="#m-glow" x="48" y="48" width="46" height="46"/></svg>
+  </header>
+
+  <div class="learn">
+    <div class="badge">오늘의<br>배움</div>
+    <div>
+      <p><b>'~처럼'</b>은 두 가지가 <b>닮았을 때</b> 쓰는 말이에요.<br>구름 탐험대에서 배운 것처럼, 세 칸으로 나누어 말해 봐요!</p>
+      <div class="formula">
+        <span class="chip a">어떤 버섯이</span><span class="plus">+</span>
+        <span class="chip b">무엇처럼</span><span class="plus">+</span>
+        <span class="chip c">어때요</span>
+        <span style="font-size:15.5px;color:var(--sub);margin-left:4px;">예) 버섯이 / 레몬처럼 / 노래요.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="story">
+    <h2>🍄 숲속의 예쁜 거짓말쟁이, 독버섯</h2>
+    <p><span class="pn">1</span>비가 그친 다음 날 숲에 가면, 땅 위로 버섯들이 쏙쏙 올라와 있어요. 하지만 조심해야 해요. 버섯 가운데에는 몸속에 독을 숨긴 '독버섯'이 있거든요.</p>
+    <p><span class="pn">2</span>독버섯 중에는 생김새를 보고 이름을 붙인 버섯이 많아요. 붉은사슴뿔버섯은 사슴뿔처럼 가지가 뾰족뾰족 뻗어 있어요. 색깔은 불처럼 빨개요. 이 버섯은 손으로 만지기만 해도 피부가 다칠 수 있어요.</p>
+    <p><span class="pn">3</span>노란다발버섯은 꽃다발처럼 여러 개가 한데 모여서 자라요. 갓의 색깔은 레몬처럼 노래요.</p>
+    <p><span class="pn">4</span>그렇다면 색깔이 화려한 버섯만 조심하면 될까요? 아니에요. 독우산광대버섯은 우산처럼 갓이 활짝 펴져 있고, 눈처럼 하얘요. 깨끗해 보이지만, 작은 조각만 먹어도 목숨이 위험한 무서운 독버섯이에요. 화경버섯은 우리가 먹는 느타리버섯과 똑같이 생겼어요. 그런데 밤이 되면 반딧불이처럼 빛을 내요.</p>
+    <p><span class="pn">5</span>사람들은 "벌레가 먹은 버섯은 괜찮다", "끓이면 독이 사라진다"라고 말하기도 해요. 하지만 모두 틀린 말이에요. 버섯 전문가도 눈으로만 보고 독버섯을 가려내기는 어려워요. 숲에서 버섯을 보면 절대 따거나 먹지 말고, 눈으로만 구경해요.</p>
+    <div class="read-check">소리 내어 읽었으면 색칠해요 → <i></i><i></i><i></i></div>
+  </div>
+
+  <div class="pageno">1</div>
+</div>
+
+<!-- ============ 2쪽 ============ -->
+<div class="sheet">
+  <section class="act c-coral" style="margin-top:0">
+    <div class="act-head"><span class="n">1</span>'처럼' 보물찾기</div>
+    <p class="tip">글을 다시 읽으며 <b style="color:var(--coral)">'처럼'</b>이 나올 때마다 ○ 해요. 하나 찾을 때마다 칸을 하나씩 색칠해요.</p>
+    <div class="count">
+      <div class="stars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <span>→ '처럼'은 모두 <span class="wbox"></span> 번 나와요.</span>
+    </div>
+  </section>
+
+  <section class="act c-lemon">
+    <div class="act-head"><span class="n">2</span>세 칸에 쏙쏙 나누어 써요</div>
+    <p class="tip">글에서 찾아 빈칸을 채워요. 첫 줄은 함께 해 보는 예시예요. 모르면 아래 낱말 상자를 봐요!</p>
+    <table class="sim">
+      <tr><th class="a">어떤 버섯이</th><th class="b">무엇처럼</th><th class="c">어때요</th></tr>
+      <tr class="tbl-row-ex">
+        <td class="mush"><div class="mrow"><svg><use href="#m-deer"/></svg><span><span class="ex-tag">예시</span><br>붉은사슴뿔버섯</span></div></td>
+        <td class="like"><span class="given">사슴뿔처럼</span></td>
+        <td class="how"><span class="given">가지가 뾰족뾰족 뻗어 있어요</span></td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-deer"/></svg>붉은사슴뿔버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how"><span class="given">빨개요</span></td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-bunch"/></svg>노란다발버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how">여러 개가 한데 모여서 자라요</td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-bunch"/></svg>노란다발버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how"><span class="wbox w2"></span></td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-umb"/></svg>독우산광대버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how">갓이 활짝 펴져 있어요</td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-umb"/></svg>독우산광대버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how"><span class="wbox w2"></span></td>
+      </tr>
+      <tr>
+        <td class="mush"><div class="mrow"><svg><use href="#m-glow"/></svg>화경버섯</div></td>
+        <td class="like"><span class="wbox w2"></span> 처럼</td>
+        <td class="how"><span class="wbox w3"></span></td>
+      </tr>
+    </table>
+    <div class="bank">
+      <span class="lbl">📦 낱말 상자</span>
+      <span class="w">불</span><span class="w">눈</span><span class="w">레몬</span><span class="w">우산</span><span class="w">꽃다발</span><span class="w">반딧불이</span>
+      <span class="w">노래요</span><span class="w">하얘요</span><span class="w">빛을 내요</span>
+    </div>
+  </section>
+
+  <div class="pageno">2</div>
+</div>
+
+<!-- ============ 3쪽 ============ -->
+<div class="sheet">
+  <section class="act c-mint" style="margin-top:0">
+    <div class="act-head"><span class="n">3</span>이름 속에 숨은 낱말 찾기</div>
+    <p class="tip">구름 이름을 배울 때처럼, 버섯 이름 속에도 <b style="color:var(--mint)">닮은 물건</b>이 숨어 있어요. 숨은 낱말에 ○ 하고 빈칸을 채워요.</p>
+    <div class="names">
+      <div class="name-card">
+        <svg><use href="#m-deer"/></svg>
+        <div>
+          <div class="name-big">붉은사슴뿔버섯</div>
+          <div class="q">→ <span class="wbox w2"></span> 처럼 생겨서 붙은 이름이에요.</div>
+        </div>
+      </div>
+      <div class="name-card">
+        <svg><use href="#m-bunch"/></svg>
+        <div>
+          <div class="name-big">노란다발버섯</div>
+          <div class="q">→ 꽃 <span class="wbox"></span> 처럼 모여 자라서 붙은 이름이에요.</div>
+        </div>
+      </div>
+      <div class="name-card">
+        <svg><use href="#m-umb"/></svg>
+        <div>
+          <div class="name-big">독우산광대버섯</div>
+          <div class="q">→ <span class="wbox w2"></span> 처럼 갓이 펴져서 붙은 이름이에요.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="act c-sky">
+    <div class="act-head"><span class="n">4</span>닮은 것끼리 줄로 이어요</div>
+    <p class="tip">왼쪽 '무엇처럼'과 어울리는 오른쪽 '어때요'를 찾아 ● 와 ● 를 줄로 이어요.</p>
+    <div class="match">
+      <div class="mL"><span class="pic">🔥</span><span class="card"><b>불</b>처럼</span><span class="dot"></span></div><div></div>
+      <div class="mR"><span class="dot"></span><span class="card">하얘요</span></div>
+
+      <div class="mL"><span class="pic">🍋</span><span class="card"><b>레몬</b>처럼</span><span class="dot"></span></div><div></div>
+      <div class="mR"><span class="dot"></span><span class="card">반짝반짝 빛나요</span></div>
+
+      <div class="mL"><span class="pic">☃️</span><span class="card"><b>눈</b>처럼</span><span class="dot"></span></div><div></div>
+      <div class="mR"><span class="dot"></span><span class="card">빨개요</span></div>
+
+      <div class="mL"><span class="pic">☂️</span><span class="card"><b>우산</b>처럼</span><span class="dot"></span></div><div></div>
+      <div class="mR"><span class="dot"></span><span class="card">노래요</span></div>
+
+      <div class="mL"><span class="pic">✨</span><span class="card"><b>반딧불이</b>처럼</span><span class="dot"></span></div><div></div>
+      <div class="mR"><span class="dot"></span><span class="card">활짝 펴져요</span></div>
+    </div>
+  </section>
+
+  <div class="pageno">3</div>
+</div>
+
+<!-- ============ 4쪽 ============ -->
+<div class="sheet">
+  <section class="act c-grape" style="margin-top:0">
+    <div class="act-head"><span class="n">5</span>내가 만드는 '~처럼' 문장</div>
+    <p class="tip">버섯 색깔과 닮은 물건을 떠올려 빈칸에 써요. 힌트에 없는 물건을 써도 좋아요!</p>
+    <div class="make">
+      <div class="mk">
+        <div class="top"><svg style="color:#F2665A"><use href="#m-plain"/></svg>빨간 버섯</div>
+        <div class="sent">버섯이 <span class="wbox w2"></span> 처럼 빨개요.</div>
+        <div class="hint">힌트 <span>딸기</span><span>사과</span><span>소방차</span></div>
+      </div>
+      <div class="mk">
+        <div class="top"><svg style="color:#F5C518"><use href="#m-plain"/></svg>노란 버섯</div>
+        <div class="sent">버섯이 <span class="wbox w2"></span> 처럼 노래요.</div>
+        <div class="hint">힌트 <span>바나나</span><span>병아리</span><span>해님</span></div>
+      </div>
+      <div class="mk">
+        <div class="top"><svg style="color:#FFFFFF"><use href="#m-plain"/></svg>하얀 버섯</div>
+        <div class="sent">버섯이 <span class="wbox w2"></span> 처럼 하얘요.</div>
+        <div class="hint">힌트 <span>구름</span><span>우유</span><span>솜사탕</span></div>
+      </div>
+      <div class="mk">
+        <div class="top"><svg style="color:#B08A5E"><use href="#m-plain"/></svg>동그란 버섯</div>
+        <div class="sent">버섯이 <span class="wbox w2"></span> 처럼 동그래요.</div>
+        <div class="hint">힌트 <span>공</span><span>보름달</span><span>접시</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="act c-coral">
+    <div class="act-head"><span class="n">6</span>맞으면 O, 틀리면 X</div>
+    <p class="tip">글의 ⑤번 문단을 다시 읽고, 알맞은 칸에 ○ 해요.</p>
+    <ol class="ox">
+      <li><span class="no">1</span><span class="t">벌레가 먹은 버섯은 먹어도 괜찮아요.</span><span class="oxbox"><span>O</span><span>X</span></span></li>
+      <li><span class="no">2</span><span class="t">독버섯은 끓이면 독이 사라져요.</span><span class="oxbox"><span>O</span><span>X</span></span></li>
+      <li><span class="no">3</span><span class="t">눈처럼 하얀 버섯도 독버섯일 수 있어요.</span><span class="oxbox"><span>O</span><span>X</span></span></li>
+      <li><span class="no">4</span><span class="t">숲에서 본 버섯은 눈으로만 구경해요.</span><span class="oxbox"><span>O</span><span>X</span></span></li>
+    </ol>
+  </section>
+  <div class="pageno">4</div>
+</div>
+
+<!-- ============ 5쪽 ============ -->
+<div class="sheet">
+  <section class="act c-coral" style="margin-top:0">
+    <div class="act-head"><span class="n">7</span>안전 약속 따라 쓰기</div>
+    <p class="tip">소리 내어 읽고, 흐린 글씨를 따라 쓴 다음 빈 줄에 한 번 더 써요.</p>
+    <div class="trace">
+      <div class="lbl">🖐️ 나의 버섯 안전 약속</div>
+      <div class="row">산에서 본 버섯은 눈으로만 봐요.</div>
+      <div class="row ghost">산에서 본 버섯은 눈으로만 봐요.</div>
+      <div class="row ghost">산에서 본 버섯은 눈으로만 봐요.</div>
+      <div class="row empty"></div>
+    </div>
+  </section>
+
+  <section class="act c-mint">
+    <div class="act-head"><span class="n">8</span>나만의 버섯 이름 짓기</div>
+    <p class="tip">버섯 이름은 생김새를 보고 붙였어요. 나도 무엇을 닮은 버섯을 그리고, 이름을 지어 봐요!</p>
+    <div class="mine">
+      <div class="draw"><span class="lbl">여기에 그려요 ✏️</span></div>
+      <div class="lines">
+        <div class="l">이 버섯은 <span class="line-ans" style="min-width:120px"></span> 처럼</div>
+        <div class="l"><span class="line-ans" style="min-width:200px"></span> 요.</div>
+        <div class="l">그래서 이름은</div>
+        <div class="l"><span class="line-ans" style="min-width:160px"></span> 버섯이에요.</div>
+        <div style="font-size:14.5px;color:var(--sub);font-weight:600;line-height:1.5;">예) 이 버섯은 별처럼 반짝여요.<br>그래서 이름은 별반짝버섯이에요.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="act c-lemon">
+    <div class="act-head"><span class="n">★</span>오늘 나는요</div>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:19px;margin-left:44px;">
+      <div>'~처럼'이 무슨 뜻인지 알아요. &nbsp; 😀 &nbsp; 🙂 &nbsp; 🤔</div>
+      <div>'~처럼'을 넣어 문장을 만들 수 있어요. &nbsp; 😀 &nbsp; 🙂 &nbsp; 🤔</div>
+      <div>숲에서 버섯을 보면 어떻게 할지 알아요. &nbsp; 😀 &nbsp; 🙂 &nbsp; 🤔</div>
+    </div>
+  </section>
+  <div class="pageno">5</div>
+</div>
+
+<!-- ============ 6쪽 : 정답 ============ -->
+<div class="sheet ans">
+  <h2>✅ 정답 및 지도 도움말</h2>
+  <div class="legend"><span><mark class="l">무엇처럼</mark> = 닮은 물건</span><span><mark class="h">어때요</mark> = 생김새·색깔·모습</span></div>
+  <div class="story">
+    <p><span class="pn">2</span>… 붉은사슴뿔버섯은 <mark class="l">사슴뿔처럼</mark> <mark class="h">가지가 뾰족뾰족 뻗어 있어요</mark>. 색깔은 <mark class="l">불처럼</mark> <mark class="h">빨개요</mark>. …</p>
+    <p><span class="pn">3</span>노란다발버섯은 <mark class="l">꽃다발처럼</mark> <mark class="h">여러 개가 한데 모여서 자라요</mark>. 갓의 색깔은 <mark class="l">레몬처럼</mark> <mark class="h">노래요</mark>.</p>
+    <p><span class="pn">4</span>… 독우산광대버섯은 <mark class="l">우산처럼</mark> <mark class="h">갓이 활짝 펴져 있고</mark>, <mark class="l">눈처럼</mark> <mark class="h">하얘요</mark>. … 밤이 되면 <mark class="l">반딧불이처럼</mark> <mark class="h">빛을 내요</mark>.</p>
+  </div>
+
+  <div class="ans-grid">
+    <div class="ans-box">
+      <h3>활동 1 · '처럼' 보물찾기</h3>
+      모두 <b>7번</b><br>사슴뿔 · 불 · 꽃다발 · 레몬 · 우산 · 눈 · 반딧불이
+    </div>
+    <div class="ans-box">
+      <h3>활동 2 · 세 칸 나누기</h3>
+      붉은사슴뿔버섯 : <b>불</b>처럼<br>
+      노란다발버섯 : <b>꽃다발</b>처럼 / <b>레몬</b>처럼 – <b>노래요</b><br>
+      독우산광대버섯 : <b>우산</b>처럼 / <b>눈</b>처럼 – <b>하얘요</b><br>
+      화경버섯 : <b>반딧불이</b>처럼 – <b>빛을 내요</b>
+    </div>
+    <div class="ans-box">
+      <h3>활동 3 · 이름 속 숨은 낱말</h3>
+      붉은<b>사슴뿔</b>버섯 → 사슴뿔<br>
+      노란<b>다발</b>버섯 → 꽃다발<br>
+      독<b>우산</b>광대버섯 → 우산
+    </div>
+    <div class="ans-box">
+      <h3>활동 4 · 줄 잇기</h3>
+      불처럼 – <b>빨개요</b> &nbsp;/&nbsp; 레몬처럼 – <b>노래요</b><br>
+      눈처럼 – <b>하얘요</b> &nbsp;/&nbsp; 우산처럼 – <b>활짝 펴져요</b><br>
+      반딧불이처럼 – <b>반짝반짝 빛나요</b>
+    </div>
+    <div class="ans-box">
+      <h3>활동 5 · 내가 만드는 문장</h3>
+      정답이 정해져 있지 않아요. <b>색깔·모양이 정말 닮았는지</b>만 함께 확인해 주세요.<br>예) 딸기처럼 빨개요 / 병아리처럼 노래요
+    </div>
+    <div class="ans-box">
+      <h3>활동 6 · O X</h3>
+      1. <b>X</b> &nbsp; 2. <b>X</b> &nbsp; 3. <b>O</b> &nbsp; 4. <b>O</b><br>
+      <span style="color:var(--sub)">→ 1·2번은 사람들이 잘못 알고 있는 '속설'이에요.</span>
+    </div>
+  </div>
+
+  <div class="teacher">
+    <h3>🌱 선생님·보호자 도움말</h3>
+    <ul>
+      <li><b>'처럼' = 닮았다</b>는 뜻부터 몸으로 익혀요. "선생님 손이 ○○처럼 차가워요"처럼 주변 물건으로 먼저 말해 보면 좋아요.</li>
+      <li>활동 2는 <b>[어떤 버섯이 | 무엇처럼 | 어때요]</b> 세 칸을 손가락으로 짚으며 끊어 읽게 해 주세요. 구름 탐험대 학습지와 같은 구조예요.</li>
+      <li>활동 3은 구름 이름(양떼구름 등)을 배운 방식 그대로 복습하는 활동이에요. 이름을 소리 내어 끊어 읽으면(붉은 / 사슴뿔 / 버섯) 숨은 낱말이 더 잘 보여요.</li>
+      <li>활동 4는 짝이 될 수 있는 답이 여럿일 수 있어요(예: 눈처럼 – 반짝반짝). 아이가 까닭을 말하면 인정해 주세요.</li>
+      <li>마지막에는 꼭 <b>"숲에서 본 버섯은 눈으로만!"</b> 약속을 함께 소리 내어 말하며 마무리해요.</li>
+    </ul>
+  </div>
+  <div class="pageno">6</div>
+</div>
+
+</body>
+</html>
