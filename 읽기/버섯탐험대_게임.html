@@ -160,6 +160,11 @@
   .badge .who{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:10px 0;}
   .badge input{font-family:var(--display);font-size:22px;text-align:center;border:3px solid #F2DA86;border-radius:14px;padding:6px 10px;width:min(220px,100%);background:#fff;color:var(--ink);}
   .badge .promise{font-family:var(--display);font-size:20px;color:var(--coral);}
+  .cert-img{display:block;width:100%;max-width:440px;height:auto;margin:12px auto 0;border-radius:18px;box-shadow:0 6px 20px rgba(60,50,20,.15);background:#fff;}
+  .save-cert{display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:var(--coral);color:#fff;border-radius:16px;padding:10px 24px;font-family:var(--display);font-size:21px;box-shadow:0 3px 0 #C9493E;}
+  .save-cert:active{transform:translateY(2px);box-shadow:none;}
+  .save-cert:disabled{opacity:.5;cursor:default;}
+  .cert-hint{font-size:15px;color:var(--sub);margin:8px 0 0;}
   .reset{display:block;margin:18px auto 0;color:var(--sub);text-decoration:underline;font-size:15px;}
 
   .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
@@ -512,13 +517,125 @@
         <div class="badge">
           <h3>🏅 버섯 탐험대 대원증</h3>
           <div class="who"><label for="who">대원 이름</label><input id="who" maxlength="10" value="${esc(state.name)}" placeholder="이름 쓰기"></div>
-          <div>모은 별 <b>⭐ ${state.stars}</b>개</div>
-          <p class="promise">"숲에서 본 버섯은 눈으로만 볼게요!"</p>
+          <img class="cert-img" id="certImg" alt="버섯 탐험대 대원증">
+          <div><button class="save-cert" id="saveCert" data-act="savecert" hidden>📥 대원증 이미지 저장</button></div>
+          <p class="cert-hint" id="certHint">대원증 그림을 길게 누르면(컴퓨터는 오른쪽 클릭) 이미지로 저장할 수 있어요.</p>
         </div>` : `<p class="ask" style="text-align:center;margin-top:16px">정거장 다섯 곳을 모두 통과하면 <b>대원증</b>을 받아요!</p>`}
         <button class="reset" data-act="reset">처음부터 다시 하기</button>
       </section>`;
     const who = document.getElementById('who');
-    if (who) who.addEventListener('input', () => { state.name = who.value; save(); });
+    if (who) {
+      let t = null;
+      who.addEventListener('input', () => { state.name = who.value; save(); clearTimeout(t); t = setTimeout(drawCert, 250); });
+      drawCert();
+      setupSave();
+    }
+  }
+
+  /* ---------- 대원증 이미지 ---------- */
+  const CERT_W = 1080, CERT_H = 1350; // 4:5 세로 (SNS 게시용 비율)
+  const CERT_MUSH = [
+    ['deer',  '붉은사슴뿔버섯', '사슴뿔처럼 뾰족뾰족'],
+    ['bunch', '노란다발버섯',   '레몬처럼 노래요'],
+    ['umb',   '독우산광대버섯', '눈처럼 하얘요'],
+    ['glow',  '화경버섯',       '반딧불이처럼 빛나요'],
+  ];
+  const certFonts = Promise.all([
+    document.fonts ? document.fonts.load('80px "Jua"') : null,
+    document.fonts ? document.fonts.load('30px "Gowun Dodum"') : null,
+  ]).catch(() => {});
+  const mushImgs = {};
+  function mushImage(id) {
+    if (!mushImgs[id]) mushImgs[id] = new Promise(res => {
+      const sym = document.getElementById('m-' + id);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400">${sym ? sym.innerHTML : ''}</svg>`;
+      const img = new Image();
+      img.onload = () => res(img); img.onerror = () => res(null);
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+    return mushImgs[id];
+  }
+  function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  let certCanvas = null, drawSeq = 0;
+  async function drawCert() {
+    const seq = ++drawSeq;
+    await certFonts;
+    const imgs = await Promise.all(CERT_MUSH.map(m => mushImage(m[0])));
+    if (seq !== drawSeq) return;
+    const D = '"Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+    const B = '"Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+    const c = document.createElement('canvas'); c.width = CERT_W; c.height = CERT_H;
+    const ctx = c.getContext('2d');
+    // 바탕
+    const g = ctx.createLinearGradient(0, 0, CERT_W, CERT_H);
+    g.addColorStop(0, '#FFF5CF'); g.addColorStop(0.55, '#FFE8E5'); g.addColorStop(1, '#DDF4EC');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, CERT_W, CERT_H);
+    // 카드
+    rrect(ctx, 60, 60, CERT_W - 120, CERT_H - 120, 48); ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    ctx.setLineDash([18, 12]); ctx.lineWidth = 6; ctx.strokeStyle = '#F2C94C'; ctx.stroke(); ctx.setLineDash([]);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    // 머리
+    rrect(ctx, CERT_W / 2 - 190, 110, 380, 64, 32); ctx.fillStyle = '#FFE8E5'; ctx.fill();
+    ctx.fillStyle = '#F2665A'; ctx.font = `34px ${D}`; ctx.fillText('독버섯 숲 탐험 완료!', CERT_W / 2, 155);
+    ctx.fillStyle = '#24372F'; ctx.font = `96px ${D}`; ctx.fillText('버섯 탐험대 대원증', CERT_W / 2, 290);
+    // 버섯 네 개
+    const colW = (CERT_W - 160) / 4;
+    CERT_MUSH.forEach((m, i) => {
+      const cx = 80 + colW * i + colW / 2;
+      rrect(ctx, cx - 100, 340, 200, 200, 36); ctx.fillStyle = '#F6FAF7'; ctx.fill();
+      if (imgs[i]) ctx.drawImage(imgs[i], cx - 85, 352, 170, 170);
+      ctx.fillStyle = '#24372F'; ctx.font = `30px ${D}`; ctx.fillText(m[1], cx, 588);
+      ctx.fillStyle = '#5E6E66'; ctx.font = `24px ${B}`; ctx.fillText(m[2], cx, 626);
+    });
+    // 이름
+    ctx.fillStyle = '#5E6E66'; ctx.font = `34px ${D}`; ctx.fillText('대원 이름', CERT_W / 2, 730);
+    const nm = (state.name || '').trim() || '탐험대원';
+    let size = 120; ctx.font = `${size}px ${D}`;
+    while (ctx.measureText(nm).width > 760 && size > 50) { size -= 6; ctx.font = `${size}px ${D}`; }
+    ctx.fillStyle = '#F2665A'; ctx.fillText(nm, CERT_W / 2, 860);
+    ctx.fillStyle = '#F5B700'; rrect(ctx, CERT_W / 2 - 300, 885, 600, 10, 5); ctx.fill();
+    // 별
+    rrect(ctx, CERT_W / 2 - 210, 935, 420, 84, 42); ctx.fillStyle = '#FFF5CF'; ctx.fill();
+    ctx.fillStyle = '#24372F'; ctx.font = `44px ${D}`; ctx.fillText(`모은 별 ⭐ ${state.stars}개`, CERT_W / 2, 992);
+    // 약속
+    rrect(ctx, 130, 1060, CERT_W - 260, 110, 30); ctx.fillStyle = '#DDF4EC'; ctx.fill();
+    ctx.fillStyle = '#13705C'; ctx.font = `42px ${D}`; ctx.fillText('"숲에서 본 버섯은 눈으로만 볼게요!"', CERT_W / 2, 1130);
+    // 날짜·꼬리말
+    const d = new Date();
+    ctx.fillStyle = '#8A968F'; ctx.font = `28px ${B}`;
+    ctx.fillText(`${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`, CERT_W / 2, 1222);
+    ctx.fillStyle = '#9AA3AD'; ctx.font = `26px ${D}`; ctx.fillText('@sososoop_notes', CERT_W / 2, 1262);
+    certCanvas = c;
+    const img = document.getElementById('certImg');
+    if (img) img.src = c.toDataURL('image/png');
+  }
+  let downloadsApi;
+  async function setupSave() {
+    if (downloadsApi === undefined) {
+      try { downloadsApi = window.claude?.use ? await window.claude.use('downloads') : null; } catch(e) { downloadsApi = null; }
+    }
+    const btn = document.getElementById('saveCert');
+    if (btn && downloadsApi) btn.hidden = false;
+  }
+  async function saveCert(btn) {
+    if (!downloadsApi || !certCanvas) return;
+    const hint = document.getElementById('certHint');
+    btn.disabled = true;
+    try {
+      const blob = await new Promise(r => certCanvas.toBlob(r, 'image/png'));
+      const nm = (state.name || '').trim().replace(/[\\/:*?"<>|]/g, '') || '탐험대원';
+      await downloadsApi.save({filename: `버섯탐험대_대원증_${nm}.png`, data: blob});
+      if (hint) hint.textContent = '대원증을 저장했어요! 🎉';
+    } catch(e) {
+      if (!hint) return;
+      if (e && e.code === 'declined') hint.textContent = '저장을 취소했어요. 다시 누르면 저장할 수 있어요.';
+      else if (e && e.code === 'rate_limited') hint.textContent = '잠시 후 다시 눌러 주세요.';
+      else { hint.textContent = '이 화면에서는 저장 버튼을 쓸 수 없어요. 대원증 그림을 길게 눌러 저장해 주세요.'; btn.hidden = true; }
+    } finally { btn.disabled = false; }
   }
 
   function render() {
@@ -538,6 +655,7 @@
     if (act === 'map') { state.view = 'map'; return render(); }
     if (act === 'notebook') { state.view = 'notebook'; return render(); }
     if (act === 'sound') { state.sound = !state.sound; save(); b.textContent = state.sound ? '🔊' : '🔈'; return; }
+    if (act === 'savecert') return saveCert(b);
     if (act === 'reset') { const keep = state.sound; state = fresh(); state.sound = keep; save(); return render(); }
     if (act === 'stage') { state.view = 'stage'; state.stage = +b.dataset.i; state.q = 0; state.stageStars = 0; return render(); }
     if (act === 'next') { if (round && round.star) state.stageStars = (state.stageStars || 0) + 1; state.q++; return render(); }
